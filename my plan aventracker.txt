@@ -1,0 +1,57 @@
+AVEN Tracker Development Plan
+1. Overview
+This document outlines the development plan and current progress for the AVEN vehicle tracking system.
+2. Module Breakdown
+1.      System Initialization
+2.      Diagnostics & Error Handling
+3.      Device Configuration
+4.      Cloud Connectivity (LTE + MQTT)
+5.      Data Acquisition (GNSS + CAN)
+6.      Data Processing & Storage
+7.      Tracking Logic
+8.      Remote Commands & OTA
+9.      System Monitoring
+3. Detailed Timeline with Tasks
+Day 1–: Hardware Setup & Initialization -
+1.      MCU boot configuration (ESP32)
+2.      UART setup for LTE, GNSS
+3.      Flash memory initialization
+4.      LTE module basic AT testing(AT, signal check)
+5.      GNSS module basic testing (COMPLETED)
+6.      CAN interface initialization (Pending)
+7.      Basic diagnostics implementation (Pending)
+Day 3-4: LTE Network & Cloud Setup
+1.      SIM detection & network registration
+2.      PDP context activation(LTE DATA)
+3.      MQTT broker connection setup
+4.      SSL configuration
+5.      Device authentication
+6.      Send test data to cloud
+ 
+Day 5-6: Data Collection(GNSS+CAN) -
+1.      GNSS data parsing(latitude, longitude, speed)
+2.      CAN data reading(vehicle parameters)
+3.      Data validation checks
+Day 7-8: Core Logic & Data Handling-
+1.      Timestamping integration
+2.      Data packet creation
+3.      Flash storage when offline
+4.      Data transmission when network is back
+Day 9-10: Tracking Features-
+1.      Ignition logic( ON-live tracking & OFF- periodic tracking)
+2.      Theft detection logic(movement/tamper)
+3.      Buzzer Activation
+4.      Alert messages sending to cloud
+Day 11-12: Remote Commands & OTA-
+1.      MQTT commands
+2.      Command validation & execution
+3.      OTA firmware download
+4.      Firmware verification
+5.      Update installation & rollback handling
+Day 13-15: System Monitoring & Testing-
+1.      Power status monitoring
+2.      Memory usage tracking
+3.      Network health monitoring
+4.      End-to-end testing
+5.      Field testing(real-time tracking)
+6.      Bug fixing & Hardware issues resolution,      file:///C:/Users/HanXcel/Downloads/Avenetracker%20flowchart.svg    this is my flowc hart, what is exact my projec t what i am doing i am not understanding,   can you able to see my flowchart?   and i have to  complete this project on 27/04/2026 i don"t have time and give me indetailed what i am doing i should be know

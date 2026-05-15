@@ -1,0 +1,50 @@
+/*
+ * LTE_ConnectMQTT
+ * WORKING CONFIG — EMQX port 1883, no auth, no SSL
+ * broker.emqx.io supports IPv6 — confirmed working with Jio */
+//AvenStatus_t LTE_ConnectMQTT(UART_HandleTypeDef *huart)
+//{
+//    char resp[RX_BUF_SIZE];
+//    char cmd[128];
+//
+//    /* Configure MQTT */
+//    LTE_SendAT(huart, "AT+QMTCFG=\"pdpcid\",0,1\r\n",    resp, 300); HAL_Delay(200);
+//    LTE_SendAT(huart, "AT+QMTCFG=\"version\",0,4\r\n",   resp, 300); HAL_Delay(200);
+//    LTE_SendAT(huart, "AT+QMTCFG=\"keepalive\",0,60\r\n",resp, 300); HAL_Delay(200);
+//
+//    /* Close any existing connection */
+//    LTE_SendAT(huart, "AT+QMTCLOSE=0\r\n", resp, 3000);
+//    HAL_Delay(2000);
+//
+//    /* Open connection */
+//    printf("Opening MQTT...\r\n");
+//    snprintf(cmd, sizeof(cmd),
+//             "AT+QMTOPEN=0,\"%s\",%d\r\n", MQTT_BROKER, MQTT_PORT);
+//    LTE_SendAT(huart, cmd, resp, 5000);
+//
+//    /* Wait for +QMTOPEN: 0,0 */
+//    memset(resp, 0, sizeof(resp));
+//    if (!LTE_WaitFor(huart, "+QMTOPEN: 0,0", resp, sizeof(resp), 15000))
+//    {
+//        printf("MQTT Open failed: %s\r\n", resp);
+//        return AVEN_ERROR;
+//    }
+//    printf("MQTT Open OK\r\n");
+//    HAL_Delay(500);
+//
+//    /* Connect — unique client ID per session */
+//    snprintf(cmd, sizeof(cmd),
+//             "AT+QMTCONN=0,\"%s\"\r\n", MQTT_CLIENT_ID);
+//    HAL_UART_Transmit(huart, (uint8_t *)cmd, strlen(cmd), 1000);
+//
+//    /* Wait for +QMTCONN: 0,0,0 */
+//    memset(resp, 0, sizeof(resp));
+//    if (LTE_WaitFor(huart, "+QMTCONN: 0,0,0", resp, sizeof(resp), 10000))
+//    {
+//        printf("MQTT CONNECTED OK\r\n");
+//        return AVEN_OK;
+//    }
+//
+//    printf("MQTT Connect failed: %s\r\n", resp);
+//    return AVEN_ERROR;
+//}
