@@ -1,0 +1,69 @@
+Command 	Description
+
+AT+QMTCFG	Configure MQTT parameters: Sets version (3.1/3.1.1), keepalive, session type,      and SSL/TLS settings.
+AT+QMTOPEN	Open Network: Establishes a TCP connection to the MQTT broker's host and port.
+AT+QMTCONN	Connect to Broker: Sends the MQTT CONNECT packet with ClientID, username, and password.
+AT+QMTSUB	Subscribe: Subscribes to one or more topics with a specific QoS level.
+AT+QMTPUBEX	Publish Message: Sends a message to a specific topic. You will receive a > prompt to enter your data.
+AT+QMTUNS	Unsubscribe: Unsubscribes from specific topics.
+AT+QMTDISC	Disconnect: Disconnects the client from the MQTT broker.
+AT+QMTCLOSE	Close Network: Closes the underlying network connection.
+
+
+
+
+AT+QMTOPEN=0,"broker.emqx.io",1883 // AT+QMTOPEN = <client_idx>,<broker_address>,<port> // MQTT client number, Cloud MQTT server, MQTT port
+
+AT+QMTCONN=0,"Quectel_User_Unique_99" // AT+QMTCONN = <client_idx>,<client_id> //MQTT client number,Your device name/ID 
+
+AT+QMTSUB=0,1,"test/topic/123",0 // AT+QMTSUB = <client_idx>,<msg_id>,"<topic>",<qos>
+
+AT+QMTPUBEX=0,0,0,0"test/topic/123",5  //AT+QMTPUBEX = <client_idx>,<msg_id>,<qos>,<retain>,"<topic>",<msg_len> //MQTT client number,Message ID (auto),Quality of Service,Do not store message,Topic name,Length of message
+
+> RAKSH // >(module waits)
++QMTRECV: 0,0,"test/topic/123","RAKSH" // +QMTRECV: <client_idx>,<msg_id>,"<topic>","<message>" //your MQTT client, Message ID, FROM this topic, Actual data
+
+
+{
+msg_id	                    Meaning
+0	              Default / Auto / Not important
+1–65535	              User-defined message ID
+Same as request	      Used to match request & response
+}
+
+
+AT+QFUPL="UFS:cacert.pem",<file_size>,100                                     (QUECTEL FILE UPLOAD)
+QFUPL → stores certificate
+QSSLCFG → uses certificate
+
+1] AT+QSSLCFG="<parameter>",<sslctxid>,<value> // 
+
+<parameter> → What you are configuring
+<sslctxid> → SSL context ID (usually 1)
+<value> → Setting value
+
+2] Security Level
+AT+QSSLCFG="seclevel",1,1
+Value	Meaning
+0	No verification
+1	Verify server (most used)
+2	Mutual authentication
+
+3] SSL Version
+AT+QSSLCFG="sslversion",1,4
+Value	TLS Version
+0	SSL 3.0
+1	TLS 1.0
+2	TLS 1.1
+3	TLS 1.2
+4	TLS 1.2 (recommended)
+
+4] SNI (Server Name Indication)
+AT+QSSLCFG="sni",1,1
+
+✔️ Required for cloud brokers
+
+5] Ignore Local Time
+AT+QSSLCFG="ignorelocaltime",1,1
+
+✔️ Avoids certificate time errors
