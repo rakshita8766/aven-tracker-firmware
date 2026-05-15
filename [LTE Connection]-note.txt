@@ -1,0 +1,312 @@
+[LTE Connection]
+
+
+1 AT
+2 AT+CPIN?
+3 AT+CSQ
+4 AT+COPS?
+5 AT+CEREG?
+6 AT+QCFG="nwscanmode",3 (set LTE only mode) //
+ 
+{
+ AT+CFUN=0   (Turn Radio Off Unlocks protected settings).  
+ AT+QCFG="dftpdn",1,"jionet","","",3   (Set Registration APN)
+ AT+QCFG="ims",1  (Enable VoLTE/IMS Jio requires this for stable registration).
+ AT+CFUN=1 (Turn Radio On Wait 20-30 seconds for the module to find the tower).
+ AT+CEREG? Verify Registration(Wait until it returns +CEREG: 0,1 before moving to Phase 3).
+} //optional
+
+7 AT+QICSGP=1,3,"jionet","","",0 (configure data, set the internal internet stack to jio)
+8 AT+QIACT=1   (activate internet)
+9  AT+QIACT?   (Show Assigned IP,Shows your live Jio IPv6 address).
+10 AT+QNWINFO   (Show Network Info, Shows the LTE band you are currently using).
+11 AT+QPING=1,"google.com"   (Test Data Flow, Shows live pings from Google). 
+
+
+
+
+AT                // check communication
+AT+CPIN?          // check sim
+AT+CSQ            // check signal
+AT+CEREG?        // check network registration
+AT+QNWINFO       // check network typw
+AT+COPS=0       // select network
+AT+CGATT=1      //Attach to LTE network
+AT+CGDCONT=1,"IPV4V6","jionet"   //set APN
+AT+QIACT=1             //active data context
+AT+QIACT?              // check IP adress
+AT+QPING=1,"8.8.8.8"  //test intenet
+
+
+
+1. Check SIM Status
+If the SIM is locked or not detected, it will search forever.
+Command: AT+CPIN?
+Goal: You want to see +CPIN: READY.
+2. Set the APN
+LTE and NB-IoT require an APN to complete the registration process. Without it, the network often denies the "Attach" request.
+Command: AT+CGDCONT=1,"IP","your_apn"
+(Replace your_apn with your carrier's APN, e.g., "internet", "hologram", or "mnet.iot")
+3. Scan for Available Operators
+If the above doesn't work, see what networks the modem can actually "see" nearby. This confirms if your SIM is compatible with the available towers.
+Command: AT+COPS=?
+Note: This can take 30–120 seconds. Wait for the response. It will return a list of operators like (1,"Airtel","","40445",7).
+What is the result of AT+CPIN? and do you know your SIM's APN?
+
+
+
+
+I AM USING JIO SIM
+For a Jio SIM, the registration process requires two critical settings: the correct APN name and setting the modem to LTE-only mode, as Jio does not have 2G or 3G networks. 
+m2msupport.net
+m2msupport.net
+ +1
+Follow these steps in your terminal:
+1. Set the Jio APN
+Jio officially uses the APN jionet. Most modern Jio connections also require IPv6 or IPv4/IPv6. 
+Quectel Forums
+Quectel Forums
+ +1
+Command: AT+CGDCONT=1,"IPV4V6","jionet"
+(If your modem is older and doesn't support "IPV4V6", try AT+CGDCONT=1,"IP","jionet"). 
+Quectel Forums
+Quectel Forums
+ +1
+2. Force LTE-Only Mode
+Jio is a pure 4G (LTE) network. If your modem is trying to scan for 2G/3G first, registration will fail or take a long time. 
+Quectel Forums
+Quectel Forums
+ +2
+For many modems (like Quectel): AT+QCFG="nwscanmode",3,1
+For generic modems: AT+COPS=0,0,"Jio 4G",7 (This tells the modem to look for Jio on LTE). 
+3. Verify SIM Status
+Since you have a signal (31), ensure the SIM isn't blocked. 
+Elmeasure
+Elmeasure
+ +1
+Command: AT+CPIN?
+Expected Response: +CPIN: READY. 
+Quectel Forums
+Quectel Forums
+ +1
+4. Final Attachment
+Once the APN and mode are set, tell the modem to attach to the network:
+Command: AT+CGATT=1
+Command: AT+CEREG? 
+Summary of Jio APN Details
+Parameter 	Value
+APN	jionet
+Protocol	IPv4/IPv6 (or IPV4V6)
+Authentication	None (leave blank)
+Network Mode	4G / LTE Only
+Wait 30-60 seconds after these commands and run AT+CEREG? again.
+Does the response change from 0,2 to 0,1 or 0,5 after setting the APN?
+
+
+
+
+
+undefined
+undefined
+undefined
+8 sites
+JIO SIM card not registering to network on EC200U-CN module
+3 Jun 2024 — Steps I took to fix the issue: * Checked the current network scan mode (it was in automatic mode): AT+QCFG="nwscanmode" * Set netw...
+
+Quectel Forums
+Jio() – Set the APN to 'jionet' | M2MSupport.net
+Jio() – Set the APN to 'jionet' Jio provides cellular network services on HSPA+, HSDPA, UMTS, EDGE, GPRS, GSM technologies. To set...
+
+m2msupport.net
+Airtel & Jio - Quectel APN Switching Guide
+1. Check Network Scan Mode. First, check the module's current network scanning configuration. AT+QCFG="nwscanmode" 0 - Automatic m...
+
+Quectel Forums
+Show all
+AT+CGDCONT=1,"IPV4V6","jionet"
+After setting the APN with AT+CGDCONT=1,"IPV4V6","jionet", your modem should return OK. This tells the modem to use Jio's network for both IPv4 and IPv6 traffic. 
+Hologram SIM card
+Hologram SIM card
+ +2
+Since Jio only operates a 4G (LTE) network, follow these steps to finish the registration: 
+1. Force LTE Scan Mode 
+If your modem is still searching (+CEREG: 0,2), it might be trying to find 2G or 3G signals which Jio does not have. Force it to LTE only: 
+Command: AT+QCFG="nwscanmode",3,1 (For Quectel modules)
+Command: AT+COPS=0,0,"Jio 4G",7 (Generic manual selection for LTE) 
+Monogoto
+Monogoto
+ +2
+2. Activate the Data Context
+The APN is now defined, but the session needs to be "turned on": 
+Command: AT+CGACT=1,1
+Command: AT+CGATT=1 (Attaches the modem to the packet service) 
+Onomondo.com
+Onomondo.com
+ +2
+3. Check Final Status
+Wait about 20 seconds for the modem to handshake with the tower, then run:
+AT+CEREG?
+Success: +CEREG: 0,1 (Home) or 0,5 (Roaming).
+Failure: 0,2 (Still searching) or 0,3 (Registration denied).
+AT+CGPADDR=1
+This will show you the IP address assigned by Jio if the registration worked. 
+Quectel Forums
+Quectel Forums
+ +2
+If you still get "Searching" (0,2):
+Scan for visible networks: Run AT+COPS=?. This takes 1-2 minutes. If "Jio 4G" does not appear in the list, your antenna or local coverage is the issue.
+Check SIM Lock: Run AT+CPIN?. If it doesn't say READY, the modem can't use the SIM to authenticate. 
+EMnify
+EMnify
+ +4
+What response do you get when you run AT+CEREG? now?
+
+
+
+
+
+undefined
+undefined
+undefined
+11 sites
+AT commands 2025: Guide cellular for IoT devices
+28 Apr 2025 — Seeing it in action * AT – check the connection to the modem, should respond OK (this step is not strictly needed) * AT+COPS=0 – c...
+
+
+Onomondo.com
+AT Commands Guide for GSM | emnify Blog
+18 Jan 2022 — My AT-command only responds with ERROR - how do I get more info? In the standard configuration, the AT-Command response is short: ...
+
+
+EMnify
+How to test modem connectivity using AT commands | Onomondo
+27 Jun 2023 — The AT command test sequence * AT – checks the connection to the modem. * AT+CGREG? and/or AT+CEREG? – queries for the packet-swit...
+
+
+Onomondo.com
+Show all
+AT+QCFG="nwscanmode",3,1
+
+[2026-04-22_10:50:02:173]OK
+Great, that command locked your modem to LTE only (the 3 value) and took effect immediately (1). This is exactly what a Jio SIM needs since they don't have 2G or 3G fallback.
+Now that the modem is no longer wasting time searching for non-existent 2G/3G networks, run these two commands to see if it successfully attached to Jio:
+Check Registration:
+AT+CEREG?
+Goal: You want to see 0,1 or 0,5.
+Check Operator Name:
+AT+COPS?
+Goal: You should see "Jio 4G" in the response.
+If it still says 0,2 (searching), try triggering the attachment manually with:
+AT+CGATT=1
+What is the result of AT+CEREG? now?
+
+
+
+
+]AT+CEREG?
+
+[2026-04-22_10:50:51:261]+CEREG: 0,2
+[2026-04-22_10:50:51:261]
+[2026-04-22_10:50:51:261]OK
+Still stuck on 0,2 (searching) despite a perfect signal (31) and LTE-only mode usually points to one of two things: a SIM authentication issue or the modem being denied by the tower because of a configuration mismatch.
+Let's dig deeper. Please run these three commands and tell me the results:
+AT+CPIN?
+Check if the SIM is actually "Ready" to talk to the tower.
+AT+QCFG="nwscanseq"
+This checks the order in which the modem scans bands. Since you are using Jio, we want to make sure LTE is first.
+AT+COPS=?
+Note: This command will take 1 to 2 minutes. It forces the modem to scan every frequency it can see and list the carriers.
+Check if "Jio 4G" even appears in the list.
+One more thing to check:
+Is this a new SIM or a Jio NB-IoT SIM? Standard Jio 4G SIMs usually work instantly, but Jio NB-IoT SIMs have very specific band requirements (usually Band 3, 5, or 40).
+What does AT+CPIN? return?
+
+
+
+
+T+QCFG="nwscanseq"
+
+[2026-04-22_10:52:16:639]+QCFG: "nwscanseq",3
+[2026-04-22_10:52:16:639]
+[2026-04-22_10:52:16:639]OK
+The value 3 means your modem is set to scan LTE only, which is correct for Jio.
+Since you are still stuck in "Searching" (0,2) despite a perfect signal, it is time to check if the modem can actually "see" the Jio network and if the SIM is ready to authenticate.
+Please run these two commands and provide the output:
+AT+CPIN?
+Check if the SIM is ready. If it says READY, the SIM is fine. If it says INSERTED or ERROR, the modem isn't reading the SIM card properly.
+AT+COPS=?
+This is the most important test. It will take 1–2 minutes. It will list all networks the modem can physically see. We need to see if "Jio 4G" (or MCC/MNC 405 8xx) appears in that list.
+Run AT+CPIN? first—what does it say?
+
+
+
+
+AT+cops=?
+
+[2026-04-22_10:52:53:946]+COPS: (2,"IND-JIO","JIO","405861",7),(1,"Vi India","Vi India","40486",7),(3,"IND airtel","airtel","40445",7),,(0-4),(0-2)
+[2026-04-22_10:52:53:946]
+[2026-04-22_10:52:53:946]OK
+The scan results are excellent news: (2,"IND-JIO","JIO","405861",7).
+The 2 at the beginning of the Jio entry means the network is Current and available, and the 7 at the end confirms it is an LTE signal. Since the modem sees the network but isn't "joining" it automatically, you should now force a manual registration.
+Run these commands in this exact order:
+Force Manual Registration to Jio:
+AT+COPS=1,2,"405861",7
+(This tells the modem: "Manually register to operator 405861 using LTE".)
+Wait 10 seconds, then check status:
+AT+CEREG?
+Check if you got an IP address:
+AT+CGPADDR=1
+Troubleshooting if it still fails:
+If AT+CEREG? still returns 0,2 after the manual command, check AT+CPIN?. If the SIM is not "READY," the Jio tower will reject the connection request even if the signal is perfect.
+What is the result of AT+CEREG? after running the AT+COPS=1,2,"405861",7 command?
+
+
+
+
+AT+CEREG?
+
+[2026-04-22_10:53:46:088]+CEREG: 0,1
+[2026-04-22_10:53:46:088]
+[2026-04-22_10:53:46:088]OK
+[2026-04-22_10:54:13:287]AT+CGPADDR=1
+
+[2026-04-22_10:54:13:287]+CGPADDR: 1,"0.0.0.0,0:0:0:0:0:0:0:0"
+[2026-04-22_10:54:13:287]
+[2026-04-22_10:54:13:287]OK
+Success! +CEREG: 0,1 means you are now officially Registered on your home Jio network.
+The reason AT+CGPADDR=1 is showing 0.0.0.0 is that while you are registered to the tower, the data session (PDP Context) hasn't been fully activated to assign you an IP address.
+Run these two commands to activate the data session and get your IP:
+Activate the context:
+AT+CGACT=1,1
+Check for IP again:
+AT+CGPADDR=1
+Note: If AT+CGACT=1,1 returns an error, it usually means the APN (jionet) didn't match the specific requirements of your Jio SIM plan.
+Does AT+CGPADDR=1 show a real IP address now?
+
+
+
+
+AT+CGACT=1,1
+
+[2026-04-22_10:55:03:177]OK
+[2026-04-22_10:55:25:179]AT+CGPADDR=1
+
+[2026-04-22_10:55:25:179]+CGPADDR: 1,"0.0.0.0,2409:40F2:2123:80A9:8000::"
+[2026-04-22_10:55:25:195]
+[2026-04-22_10:55:25:195]OK
+You are now fully connected!
+The response 2409:40F2:2123:80A9:8000:: is a valid IPv6 address assigned by Jio. Jio's network is "IPv6-first," so it is normal to see 0.0.0.0 for the IPv4 part while receiving a full IPv6 prefix.
+What this means:
+Registration: Successful (+CEREG: 0,1)
+Data Session: Active (OK on AT+CGACT)
+Internet Access: Your modem now has a live data path via Jio.
+Final Verification
+To confirm you can actually reach the internet, try to "ping" a DNS server (if your module supports it) or check your network operator info one last time:
+Check Operator: AT+COPS?
+Check Signal Stability: AT+CSQ
+Pro-Tip: If you specifically need an IPv4 address for your application, you can try changing the context to AT+CGDCONT=1,"IP","jionet", but many Jio towers will only grant an IPv6 address.
+Would you like to try sending a test HTTP request or an MQTT message to verify the data flow?
+
+
+
+
